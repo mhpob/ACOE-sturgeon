@@ -1,0 +1,12 @@
+name: api_duckdb
+
+services:
+  api:
+    image: plumber_db
+    working_dir: /app
+    ports:
+      - "20619:8000"
+    volumes:
+      - ${PWD}/api_duckdb/result:/app/result
+      - ${PWD}/api_duckdb/api.R:/app/api.R"
+    command: api.R
