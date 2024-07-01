@@ -1,3 +1,4 @@
+# need to cd into api_duckdb dir to work
 name: api_duckdb
 
 services:
@@ -7,6 +8,6 @@ services:
     ports:
       - "20619:8000"
     volumes:
-      - ${PWD}/api_duckdb/result:/app/result
-      - ${PWD}/api_duckdb/api.R:/app/api.R"
+      - ${PWD}/result:/app/result
+      - ${PWD}/api.R:/app/api.R
     command: api.R
