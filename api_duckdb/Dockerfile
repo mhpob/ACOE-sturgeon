@@ -1,5 +1,16 @@
-FROM rstudio/plumber
+FROM rocker/r-ver
 
-RUN R -e "install.packages(c('data.table', 'duckdb'))"
+RUN mkdir app && \
+    cd app && \
+    mkdir result
 
-COPY / /app
+RUN R -e "install.packages(c('data.table', 'duckdb', 'plumber'))"
+
+EXPOSE 8000
+
+ENTRYPOINT ["R", \
+            "-e", \
+            "plumber::pr(rev(commandArgs())[1]) |> \
+            plumber::pr_run(host = '0.0.0.0', port = 8000)"]
+
+CMD ["~/plumber.R"]
