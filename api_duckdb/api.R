@@ -11,26 +11,27 @@ library(plumber)
 library(data.table)
 library(duckdb)
 
-
-
 #* @apiTitle Plumber Example API
 #* @apiDescription Plumber example description.
 
-#' @get /db
-#' @serializer print
+#* @get /db
+#* @serializer print
 function() {
-    con <- dbConnect(
-    duckdb(),
-    dbdir = "result/sturg-alert.duckdb",
-    read_only = FALSE
-  )
+  con <- dbConnect(
+  duckdb(),
+  dbdir = "result/sturg-alert.duckdb",
+  read_only = TRUE
+)
 
-  dbGetQuery(con, "SELECT * FROM alerts")
+  res <- dbGetQuery(con, "SELECT * FROM alerts")
 
+  dbDisconnect(con)
+  
+  res
 }
 
-#' @post /
-#' @serializer cat
+#* @post /
+#* @serializer cat
 function(fish = 'unknown') {
   payload <- as.data.table(fish)
   payload[, time := Sys.time()]
@@ -39,36 +40,12 @@ function(fish = 'unknown') {
     duckdb(),
     dbdir = "result/sturg-alert.duckdb",
     read_only = FALSE
-)
-
+  )
   dbAppendTable(con, "alerts", payload)
-  
+  dbDisconnect(con)
   
   paste0('Detection of ', payload$fish, ' logged at ', payload$time)
   
-}
-
-
-## @post /
-function(req) {
-  payload <- req$argsBody
-  
-  if (length(payload) > 1) {
-    stop("Too many parameters.")
-  }
-  
-  if (!all(names(payload) == c("fish"))) {
-    stop("Dont do this.")
-  }
-
-  payload <- as.data.table(payload)
-  payload[, detection_time := Sys.time()]
-
-  fwrite(payload, 'result/detection_log.csv', append = TRUE)
-  
-  list(
-    msg = paste0('Detection of', payload$fish, 'logged at', as.POSIXct(payload$detection_time, format = '%Y%m%d%H%M%S'))
-  )
 }
 
 
@@ -78,10 +55,4 @@ function() {
     fls = list.files(),
     res = list.files("result")
   )
-}
-
-#* @get /log
-#' @serializer print
-function(){
-  fread('result/detection_log.csv') 
 }
