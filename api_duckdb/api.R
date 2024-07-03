@@ -10,22 +10,22 @@
 library(plumber)
 library(data.table)
 library(duckdb)
+library(pool)
 
 #* @apiTitle Plumber Example API
 #* @apiDescription Plumber example description.
 
+pool <- dbPool(
+  duckdb(),
+  dbdir = "result/sturg-alert.duckdb",
+  read_only = FALSE
+)
+
 #* @get /db
 #* @serializer print
 function() {
-  con <- dbConnect(
-  duckdb(),
-  dbdir = "result/sturg-alert.duckdb",
-  read_only = TRUE
-)
-
+  con <- localCheckout(pool)
   res <- dbGetQuery(con, "SELECT * FROM alerts")
-
-  dbDisconnect(con)
   
   res
 }
@@ -36,13 +36,8 @@ function(fish = 'unknown') {
   payload <- as.data.table(fish)
   payload[, time := Sys.time()]
 
-  con <- dbConnect(
-    duckdb(),
-    dbdir = "result/sturg-alert.duckdb",
-    read_only = FALSE
-  )
+  con <- localCheckout(pool)
   dbAppendTable(con, "alerts", payload)
-  dbDisconnect(con)
   
   paste0('Detection of ', payload$fish, ' logged at ', payload$time)
   

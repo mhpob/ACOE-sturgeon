@@ -2,6 +2,7 @@ library(duckdb)
 library(data.table)
 library(pool)
 
+
 con <- dbPool(
     drv = duckdb(),
     dbdir = "api_duckdb/result/sturg-alert.duckdb",
