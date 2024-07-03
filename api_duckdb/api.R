@@ -34,7 +34,11 @@ function() {
 #* @serializer cat
 function(fish = 'unknown') {
   payload <- as.data.table(fish)
-  payload[, time := Sys.time()]
+  payload[, let(
+    time = Sys.time(),
+    lat = rnorm(1, 38.52816),
+    lon = rnorm(1, -75.75469)
+  )]
 
   con <- localCheckout(pool)
   dbAppendTable(con, "alerts", payload)
