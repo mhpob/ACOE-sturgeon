@@ -1,11 +1,14 @@
 library(duckdb)
 library(data.table)
+library(pool)
 
-con <- dbConnect(
-    duckdb(),
+con <- dbPool(
+    drv = duckdb(),
     dbdir = "api_duckdb/result/sturg-alert.duckdb",
     read_only = FALSE
 )
+
+poolClose(con)
 
 dbExecute(con, "CREATE TABLE alerts (fish VARCHAR, time TIMESTAMP)")
 
