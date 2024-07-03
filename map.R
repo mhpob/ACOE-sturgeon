@@ -9,8 +9,8 @@ nan <- st_read('s:/nansturg-analysis/manuscript/data/spatial/NHD_H_0208_HU4_GDB.
                         WHERE States LIKE 'D%'")
 
 nan <- st_read('s:/nansturg-analysis/manuscript/data/spatial/NHD_H_0208_HU4_GDB.gdb',
-                         layer = 'nhdarea',
-                         wkt_filter = nan$wkt)
+               layer = 'nhdarea',
+               wkt_filter = nan$wkt)
 
 library(geoarrow)
 states <- arrow::open_dataset('../chesapeake-backbone/data and imports/matl_states.parquet') |> 
@@ -18,16 +18,26 @@ states <- arrow::open_dataset('../chesapeake-backbone/data and imports/matl_stat
   dplyr::filter(STATE_ABBR %in% c('MD', 'DE'))
 
 
+sturg <- data.table::fread('../stressed-sturgeon/data/detections/sturgeon_22_23.gz')
+sturg <- unique(sturg, by = 'stationname')
+sturg <- st_as_sf(sturg, coords = c('longitude', 'latitude'),
+                  crs = 4326)
+
 nan_plot <-
   ggplot() +
   geom_sf(data = states, aes(fill = STATE_ABBR)) +
   scale_fill_manual(values = c('lightblue', 'yellow')) +
   geom_sf(data = nan, fill = NA) +
   geom_sf(data = dredge, aes(color = state), lwd = 1) +
+  geom_sf(data = sturg) +
   scale_color_manual(values = c('blue', 'red')) +
   coord_sf(xlim = c(-75.96, -75.54), ylim = c(38.2467, 38.7), expand = F) +
-  annotate('point', x = c(-75.59, -75.77), y = c(38.65, 38.692),
-           size = 6, pch=8) +
+  annotate('point', x = c(-75.60906, -75.77), y = c(38.64029, 38.692),
+           size = 6, pch=8, col = 'red') +
+  annotate('point', x = c(-75.60906), y = c(38.64029),
+           size = 6, pch=2, col = 'red') +
+  annotate('point', x = c(-75.75747), y = c(38.52719),
+           size = 6, pch=6, col = 'red') +
   labs(x = NULL, y = NULL) +
   theme_bw() +
   theme(legend.position = 'none')
