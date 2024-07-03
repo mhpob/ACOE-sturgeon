@@ -43,6 +43,16 @@ function(fish = 'unknown') {
   con <- localCheckout(pool)
   dbAppendTable(con, "alerts", payload)
   
+  # # add something to send email? Or maybe use GHA to send digest?
+  # system("curl --ssl-reqd \
+  # --url 'smtps://smtp.gmail.com:465' \
+  # --user 'username@gmail.com:password' \
+  # --mail-from 'username@gmail.com' \
+  # --mail-rcpt 'john@example.com' \
+  # --upload-file mail.txt")
+
+
+
   paste0('Detection of ', payload$fish, ' logged at ', payload$time)
   
 }
