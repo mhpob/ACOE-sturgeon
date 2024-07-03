@@ -1,10 +1,12 @@
 
-docker build -t plumber_db `pwd`/api_duckdb
+docker build -t sturgeon_alert `pwd`/api_duckdb
 
 
 ## run the image
 
-docker run --rm -p 20619:8000 -w /app  -v `pwd`/api_duckdb/result:/app/result -v `pwd`/api_duckdb/api.R:/app/api.R plumber_db api.R
+docker run --name sturgeon_alert --rm -p 20619:8000 -w /app  \
+    -v `pwd`/api_duckdb/result:/app/result -v `pwd`/api_duckdb/api.R:/app/api.R \
+    sturgeon_alert api.R
 
 # docker comes first, then run, then options
 # then comes the image ("plumber")
@@ -15,4 +17,6 @@ docker run --rm -p 20619:8000 -w /app  -v `pwd`/api_duckdb/result:/app/result -v
 
 docker run -it --rm --entrypoint /bin/bash -w /app plumber_db 
 
-curl http://localhost:20619 -d "fish=mob"
+curl -w '\n' http://localhost:20619/fls
+curl -w '\n' http://localhost:20619/db
+curl -w '\n' http://localhost:20619/ -d "fish=boi_pool"
