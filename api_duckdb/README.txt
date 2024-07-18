@@ -6,7 +6,7 @@ docker build -t sturgeon_alert `pwd`/api_duckdb
 
 docker run --name sturgeon_alert --rm -p 20619:8000 -w /app  \
     -v `pwd`/api_duckdb/result:/app/result -v `pwd`/api_duckdb/api.R:/app/api.R \
-    sturgeon_alert api.R
+    sturgeon_alert 
 
 # docker comes first, then run, then options
 # then comes the image ("plumber")
